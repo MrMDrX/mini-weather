@@ -11,9 +11,20 @@ class WeatherService {
   static const String _baseUrl =
       'https://api.openweathermap.org/data/2.5/weather';
 
-  Future<Weather> getWeather(String city) async {
+  Future<Weather> getWeatherByCity(String city) async {
     final Uri url =
         Uri.parse('$_baseUrl/weather?q=$city&apiKey=$apiKey&units=metric');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      return Weather.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load weather data');
+    }
+  }
+
+  Future<Weather> getWeatherByCoordinates(double lat, double lon) async {
+    final Uri url =
+        Uri.parse('$_baseUrl?lat=$lat&lon=$lon&apiKey=$apiKey&units=metric');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       return Weather.fromJson(json.decode(response.body));
@@ -39,5 +50,17 @@ class WeatherService {
     String? city = placemarks[0].locality;
 
     return city ?? "";
+  }
+
+  //get coordinates
+  Future<Position> getCurrentPosition() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception('Location permissions are permanently denied');
+    }
+    return await Geolocator.getCurrentPosition();
   }
 }

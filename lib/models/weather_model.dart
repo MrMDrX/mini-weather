@@ -1,6 +1,6 @@
 class Weather {
   final String city;
-  final String temperature;
+  final double temperature;
   final String condition;
 
   Weather(
