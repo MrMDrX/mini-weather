@@ -19,39 +19,36 @@ class _WeatherScreenState extends State<WeatherScreen> {
   Weather? _weather;
 
   _fetchWeather() async {
-    final Position position = await _weatherService.getCurrentPosition();
-    // final String city = await _weatherService.getCurrentCity();
     try {
+      final Position position = await _weatherService.getCurrentPosition();
       final weather = await _weatherService.getWeatherByCoordinates(
           position.latitude, position.longitude);
-      // final weather = await _weatherService.getWeatherByCity(city);
       setState(() {
         _weather = weather;
       });
     } catch (e) {
-      // ignore: avoid_print
-      print(e);
+      setState(() {
+        _weather = null;
+      });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unknown error occurred')),
+      );
     }
   }
 
+  static const Map<String, String> weatherAnimations = {
+    'clear': 'assets/sunny.json',
+    'clouds': 'assets/cloudy.json',
+    'rain': 'assets/rainy.json',
+    'drizzle': 'assets/rain.json',
+    'thunderstorm': 'assets/thunder.json',
+    'snow': 'assets/snowy.json',
+    'mist': 'assets/cloudy.json',
+  };
+
   String getWeatherAnimation(String condition) {
-    if (condition.toLowerCase() == 'clear') {
-      return 'assets/sunny.json';
-    } else if (condition.toLowerCase() == 'clouds') {
-      return 'assets/cloudy.json';
-    } else if (condition.toLowerCase() == 'rain') {
-      return 'assets/rainy.json';
-    } else if (condition.toLowerCase() == 'drizzle') {
-      return 'assets/rain.json';
-    } else if (condition.toLowerCase() == 'thunderstorm') {
-      return 'assets/thunder.json';
-    } else if (condition.toLowerCase() == 'snow') {
-      return 'assets/snowy.json';
-    } else if (condition.toLowerCase() == 'mist') {
-      return 'assets/cloudy.json';
-    } else {
-      return 'assets/sunny.json';
-    }
+    return weatherAnimations[condition.toLowerCase()] ?? 'assets/sunny.json';
   }
 
   @override

@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:mini_weather/theme/theme.dart';
 
 class ThemeProvider with ChangeNotifier {
-  ThemeData _themeData = lightTheme;
+  ThemeData _themeData;
+
+  ThemeProvider() : _themeData = _getInitialTheme();
+
+  static ThemeData _getInitialTheme() {
+    final brightness =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
+    return (brightness == Brightness.dark) ? darkTheme : lightTheme;
+  }
 
   ThemeData get themeData => _themeData;
 
